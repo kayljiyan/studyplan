@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, UUID, String, Float, DateTime, Boolean
-from sqlalchemy.orm import relationship
-from .dbconf import Base
+from sqlalchemy.orm import relationship, Mapped
+from dbconf import Base
+import schemas
 
 class Users(Base):
     __tablename__ = "users"
@@ -13,7 +14,6 @@ class Users(Base):
 
     sprite_instances = relationship("SpriteInstances", back_populates="user")
     tasks = relationship("Tasks", back_populates="user")
-    forums = relationship(secondary="ForumMembers", back_populates="users")
     user_logs = relationship("UserLogs", back_populates="user")
 
 class Sprites(Base):
@@ -33,7 +33,6 @@ class Forums(Base):
 
     forum_members = relationship("ForumMembers", back_populates="forum")
     forum_comments = relationship("ForumComments", back_populates="forum")
-    users = relationship(secondary="Users", back_populates="forums")
 
 class Tasks(Base):
     __tablename__ = "tasks"
@@ -41,7 +40,7 @@ class Tasks(Base):
     task_uuid = Column(UUID, primary_key=True)
     task_details = Column(String, nullable=False)
     task_deadline = Column(DateTime, nullable=False)
-    user_uuid = Column(UUID, ForeignKey("user.user_uuid"), nullable=False)
+    user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
     user = relationship("Users", back_populates="tasks")
     task_logs = relationship("TaskLogs", back_populates="task")
@@ -107,4 +106,4 @@ class SpriteInstanceLogs(Base):
     created_at = Column(DateTime, nullable=False)
     sprite_instance_uuid = Column(UUID, ForeignKey("sprite_instances.sprite_instance_uuid"), nullable=False)
 
-    sprite_instance = relationship("SpriteInstances", back_populates="sprite_instances_logs")
+    sprite_instance = relationship("SpriteInstances", back_populates="sprite_instance_logs")
