@@ -83,7 +83,7 @@ class TaskLogs(Base):
     __tablename__ = "task_logs"
 
     task_log_uuid = Column(UUID, primary_key=True)
-    task_details = Column(String, nullable=False)
+    task_log_details = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
     task_uuid = Column(UUID, ForeignKey("tasks.task_uuid"), nullable=False)
 
@@ -93,7 +93,7 @@ class UserLogs(Base):
     __tablename__ = "user_logs"
 
     user_log_uuid = Column(UUID, primary_key=True)
-    user_details = Column(String, nullable=False)
+    user_log_details = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
     user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
