@@ -1,20 +1,7 @@
 from sqlalchemy import Column, ForeignKey, UUID, String, Float, DateTime, Boolean
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship
 from dbconf import Base
 import schemas
-
-class Users(Base):
-    __tablename__ = "users"
-
-    user_uuid = Column(UUID, primary_key=True)
-    user_fname = Column(String, nullable=False)
-    user_lname = Column(String, nullable=False)
-    user_email = Column(String, nullable=False)
-    user_password = Column(String, nullable=False)
-
-    sprite_instances = relationship("SpriteInstances", back_populates="user")
-    tasks = relationship("Tasks", back_populates="user")
-    user_logs = relationship("UserLogs", back_populates="user")
 
 class Sprites(Base):
     __tablename__ = "sprites"
@@ -34,6 +21,18 @@ class Forums(Base):
     forum_members = relationship("ForumMembers", back_populates="forum")
     forum_comments = relationship("ForumComments", back_populates="forum")
 
+class Users(Base):
+    __tablename__ = "users"
+
+    user_uuid = Column(UUID, primary_key=True)
+    user_fname = Column(String, nullable=False)
+    user_lname = Column(String, nullable=False)
+    user_email = Column(String, nullable=False)
+    user_password = Column(String, nullable=False)
+
+    sprite_instances = relationship("SpriteInstances", back_populates="user")
+    tasks = relationship("Tasks", back_populates="user")
+    user_logs = relationship("UserLogs", back_populates="user")
 class Tasks(Base):
     __tablename__ = "tasks"
 
