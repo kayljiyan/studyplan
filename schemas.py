@@ -12,7 +12,7 @@ class SpriteInstanceLogs(BaseModel):
     sprite_instance_uuid: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserLogs(BaseModel):
     user_log_uuid: UUID4
@@ -21,7 +21,7 @@ class UserLogs(BaseModel):
     user_uuid: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TaskLogs(BaseModel):
     task_log_uuid: UUID4
@@ -30,7 +30,7 @@ class TaskLogs(BaseModel):
     task_uuid: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ForumComments(BaseModel):
     forum_comment_uuid: UUID4
@@ -40,7 +40,7 @@ class ForumComments(BaseModel):
     forum_member_uuid: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ForumMembers(BaseModel):
     forum_member_uuid: UUID4
@@ -50,7 +50,7 @@ class ForumMembers(BaseModel):
     user_uuid: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SpriteInstances(BaseModel):
     sprite_instance_uuid: UUID4
@@ -60,7 +60,7 @@ class SpriteInstances(BaseModel):
     sprite_instance_logs: list[SpriteInstanceLogs]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Tasks(BaseModel):
     task_uuid: UUID4
@@ -70,7 +70,7 @@ class Tasks(BaseModel):
     task_logs: list[TaskLogs]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserBase(BaseModel):
     user_uuid: UUID4
@@ -92,13 +92,13 @@ class Forums(BaseModel):
     users: list[UserBase]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Users(UserBase):
     forums: list[Forums]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Sprites(BaseModel):
     sprite_uuid: UUID4
@@ -106,4 +106,4 @@ class Sprites(BaseModel):
     sprite_summon_chance: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
