@@ -32,71 +32,75 @@ class TaskLogs(BaseModel):
     class Config:
         from_attributes = True
 
-class ForumComments(BaseModel):
-    forum_comment_uuid: UUID4
+class ForumCommentAddToDB(BaseModel):
     forum_comment: str
     created_at: datetime
     forum_uuid: UUID4
-    forum_member_uuid: UUID4
-
+    user_uuid: UUID4
+class ForumComments(ForumCommentAddToDB):
+    forum_comment_uuid: UUID4
     class Config:
         from_attributes = True
 
-class ForumMembers(BaseModel):
-    forum_member_uuid: UUID4
+class ForumMemberAddToDB(BaseModel):
     is_owner: bool
     created_at: datetime
     forum_uuid: UUID4
     user_uuid: UUID4
 
+class ForumMembers(ForumMemberAddToDB):
+    forum_member_uuid: UUID4
     class Config:
         from_attributes = True
 
-class SpriteInstances(BaseModel):
-    sprite_instance_uuid: UUID4
+class SpriteInstanceAddToDB(BaseModel):
     acquisition_date: datetime
     sprite_uuid: UUID4
     user_uuid: UUID4
+class SpriteInstances(SpriteInstanceAddToDB):
+    sprite_instance_uuid: UUID4
     sprite_instance_logs: list[SpriteInstanceLogs]
-
     class Config:
         from_attributes = True
 
-class Tasks(BaseModel):
-    task_uuid: UUID4
+class TaskAddToDB(BaseModel):
     task_details: str
     task_deadline: datetime
     user_uuid: UUID4
+
+class Tasks(TaskAddToDB):
+    task_uuid: UUID4
     task_logs: list[TaskLogs]
 
     class Config:
         from_attributes = True
 
-class UserBase(BaseModel):
-    user_uuid: UUID4
-    user_fname: str
-    user_lname: str
+class UserLogin(BaseModel):
     user_email: EmailStr
     user_password: str
+
+class UserRegister(UserLogin):
+    user_fname: str
+    user_lname: str
+
+class Users(UserRegister):
+    user_uuid: UUID4
+    is_premium: bool
+    is_confirmed: bool
     sprite_instances: list[SpriteInstances]
     tasks: list[Tasks]
     user_logs: list[UserLogs]
-
-class Forums(BaseModel):
-    forum_uuid: UUID4
-    forum_title: str
-    forum_status: str
-    created_at: datetime
-    forum_members: list[ForumMembers]
-    forum_comments: list[ForumComments]
-    users: list[UserBase]
-
     class Config:
         from_attributes = True
 
-class Users(UserBase):
-    forums: list[Forums]
-
+class ForumAddToDB(BaseModel):
+    forum_title: str
+    forum_status: str
+class Forums(BaseModel):
+    forum_uuid: UUID4
+    created_at: datetime
+    forum_members: list[ForumMembers]
+    forum_comments: list[ForumComments]
     class Config:
         from_attributes = True
 

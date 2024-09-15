@@ -1,9 +1,9 @@
 # modules used
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import os
 
 # loads the environment variables
-load_dotenv()
+# load_dotenv()
 
 # environment variables
 SECRET_KEY: str = os.environ.get('SECRET_KEY')

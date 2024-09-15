@@ -34,17 +34,43 @@ def login(
     ):
     try:
         account = dbops.login(db,request.username,request.password)
-        if (account is not None):
-            print(f'{account.user_uuid}')
-            data = { "user_uuid": f'{account.user_uuid}', "user_email": account.user_email }
-            access_token_expiry_date = timedelta(days=consts.ACCESS_TOKEN_EXPIRE_DAYS)
-            access_token = security.generate_access_token(data, access_token_expiry_date)
-            response.status_code = status.HTTP_200_OK
-            return { "access_token": access_token, "access_type": "Bearer" }
-        else:
-            response.status_code = status.HTTP_400_BAD_REQUEST
-            response.headers["WWW-Authenticate"] = "Bearer"
-            return { "detail": "Incorrect username or password" }
+        data = { "user_uuid": f'{account.user_uuid}', "user_email": account.user_email }
+        access_token_expiry_date = timedelta(days=consts.ACCESS_TOKEN_EXPIRE_DAYS)
+        access_token = security.generate_access_token(data, access_token_expiry_date)
+        response.status_code = status.HTTP_200_OK
+        return { "access_token": access_token, "access_type": "Bearer" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.headers["WWW-Authenticate"] = "Bearer"
+        return { "detail": str(e) }
+
+@app.post('/api/v1/register')
+async def register(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        user = schemas.UserRegister(**data)
+        dbops.register(db, user)
+        security.send_email(user.user_email)
+        response.status_code = status.HTTP_201_CREATED
+        return { "detail": "Please check your email for confirmation link" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.get('/api/v1/confirm/{user_email}')
+def confirm_email(
+    response: Response,
+    user_email: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        dbops.confirm_email(db, user_email)
+        response.status_code = status.HTTP_202_ACCEPTED
+        return { 'detail': 'Email has been confirmed' }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
@@ -62,5 +88,7 @@ async def deserialize(token: Annotated[str, Depends(oauth2_scheme)], response: R
         return { "detail": str(e) }
 
 if __name__ == "__main__":
+    from dotenv import load_dotenv
     import uvicorn
+    load_dotenv()
     uvicorn.run("main:app", port=8000, reload=True)
