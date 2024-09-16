@@ -68,8 +68,11 @@ class TaskAddToDB(BaseModel):
     task_deadline: datetime
     user_uuid: UUID4
 
-class Tasks(TaskAddToDB):
+class TaskUpdateToDB(TaskAddToDB):
     task_uuid: UUID4
+
+class Tasks(TaskUpdateToDB):
+    is_done: bool
     task_logs: list[TaskLogs]
 
     class Config:

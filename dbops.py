@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from uuid import UUID
 import models, schemas, security
 
 def login(db: Session, username: str, password: str):
@@ -18,12 +19,35 @@ def register(db: Session, user: schemas.UserRegister):
     db.commit()
 
 def confirm_email(db: Session, user_email: str):
-    user = db.query(models.Users).filter(models.Users.user_email == user_email)
-    if user:
-        user.update({'is_confirmed': True})
+    db_user = db.query(models.Users).filter(models.Users.user_email == user_email)
+    if db_user:
+        db_user.update({'is_confirmed': True})
         db.commit()
 
 def create_task(db: Session, task: schemas.TaskAddToDB):
     db_task = models.Tasks(task_details=task.task_details, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
     db.commit()
+
+def update_task(db: Session, task: schemas.TaskUpdateToDB):
+    db_task = db.query(models.Tasks).filter(models.Tasks.task_uuid == task.task_uuid)
+    if db_task:
+        db_task.update({
+            'task_details': task.task_details,
+            'task_deadline': task.task_deadline
+        })
+        db.commit()
+
+def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
+    db_task = db.query(models.Tasks).filter(models.Tasks.task_uuid == task_uuid and models.Tasks.user_uuid == user_uuid)
+    if db_task:
+        db_task.update({
+            'is_done': True
+        })
+        db.commit()
+
+def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
+    db_task = db.query(models.Tasks).filter(models.Tasks.task_uuid == task_uuid and models.Tasks.user_uuid == user_uuid)
+    if db_task:
+        db_task.delete()
+        db.commit()

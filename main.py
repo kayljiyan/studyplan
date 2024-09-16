@@ -27,7 +27,7 @@ app.add_middleware(
 )
 
 @app.post('/api/v1/login')
-def login(
+async def login(
     request: Annotated[OAuth2PasswordRequestForm, Depends()],
     response: Response,
     db: Session = Depends(get_db)
@@ -62,7 +62,7 @@ async def register(
         return { "detail": str(e) }
 
 @app.get('/api/v1/confirm/{user_email}')
-def confirm_email(
+async def confirm_email(
     response: Response,
     user_email: str,
     db: Session = Depends(get_db),
@@ -106,6 +106,59 @@ async def create_task(
         dbops.create_task(db, task)
         response.status_code = status.HTTP_201_CREATED
         return { "detail": "Task has been created" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.patch('/api/v1/task')
+async def update_task(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        data = {**data, 'user_uuid': payload.user_uuid}
+        task = schemas.TaskUpdateToDB(**data)
+        dbops.update_task(db, task)
+        response.status_code = status.HTTP_202_ACCEPTED
+        return { "detail": "Task has been updated" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.patch('/api/v1/task/{task_uuid}')
+async def complete_task(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    task_uuid: str,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        dbops.complete_task(db, task_uuid, payload.user_uuid)
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Task has been completed" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.delete('/api/v1/task/{task_uuid}')
+async def delete_task(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    task_uuid: str,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        dbops.delete_task(db, task_uuid, payload.user_uuid)
+        response.status_code = status.HTTP_204_NO_CONTENT
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }

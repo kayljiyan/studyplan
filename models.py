@@ -41,6 +41,7 @@ class Tasks(Base):
     task_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
     task_details = Column(String, nullable=False)
     task_deadline = Column(DateTime, nullable=False)
+    is_done = Column(Boolean, default=False, nullable=False)
     user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
     user = relationship("Users", back_populates="tasks")
