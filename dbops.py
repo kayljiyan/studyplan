@@ -22,3 +22,8 @@ def confirm_email(db: Session, user_email: str):
     if user:
         user.update({'is_confirmed': True})
         db.commit()
+
+def create_task(db: Session, task: schemas.TaskAddToDB):
+    db_task = models.Tasks(task_details=task.task_details, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
+    db.add(db_task)
+    db.commit()

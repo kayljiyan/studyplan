@@ -76,7 +76,10 @@ def confirm_email(
         return { "detail": str(e) }
 
 @app.get('/api/v1/deserialize')
-async def deserialize(token: Annotated[str, Depends(oauth2_scheme)], response: Response):
+async def deserialize(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    response: Response
+    ):
     try:
         payload = security.verify_access_token(token)
         payload = schemas.TokenData(**payload)
@@ -85,6 +88,26 @@ async def deserialize(token: Annotated[str, Depends(oauth2_scheme)], response: R
         return { 'data': data }
     except Exception as e:
         response.status_code = status.HTTP_401_UNAUTHORIZED
+        return { "detail": str(e) }
+
+@app.post('/api/v1/task')
+async def create_task(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        data = {**data, 'user_uuid': payload.user_uuid}
+        task = schemas.TaskAddToDB(**data)
+        dbops.create_task(db, task)
+        response.status_code = status.HTTP_201_CREATED
+        return { "detail": "Task has been created" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 if __name__ == "__main__":
