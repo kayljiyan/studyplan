@@ -7,7 +7,6 @@ from os import getenv
 # load_dotenv()
 
 SQLALCHEMY_DATABASE_URL = getenv('SQLALCHEMY_DATABASE_URL')
-
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
 )
