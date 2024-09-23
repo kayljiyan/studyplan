@@ -51,3 +51,7 @@ def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
     if db_task:
         db_task.delete()
         db.commit()
+
+def get_tasks(db: Session, user_uuid: UUID):
+    tasks = db.query(models.Tasks).filter(models.Tasks.user_uuid == UUID(user_uuid)).all()
+    return tasks

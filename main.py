@@ -163,6 +163,22 @@ async def delete_task(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.get('/api/v1/tasks')
+async def get_tasks(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        tasks = dbops.get_tasks(db, payload.user_uuid)
+        response.status_code = status.HTTP_200_OK
+        return { "data": tasks }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 if __name__ == "__main__":
     from dotenv import load_dotenv
     import uvicorn
