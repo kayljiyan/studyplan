@@ -179,8 +179,11 @@ async def get_tasks(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-if __name__ == "__main__":
+def main():
     from dotenv import load_dotenv
     import uvicorn
     load_dotenv()
     uvicorn.run("main:app", port=8000, reload=True)
+
+if __name__ == "__main__":
+    main()
