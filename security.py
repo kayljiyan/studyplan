@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, timezone
 from typing import Any
-import jwt, consts, hashlib, uuid, os, smtplib, ssl
+import jwt, consts as consts, hashlib, uuid, os, smtplib, ssl
 
 def generate_access_token(payload: dict, expiry_date: timedelta | None = None) -> str:
     to_encode = payload.copy()

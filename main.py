@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from datetime import timedelta
-import models, schemas, dbops, security, consts
+import models as models, schemas as schemas, dbops as dbops, security as security, consts as consts
 from dbconf import SessionLocal, engine
 from sqlalchemy.orm import Session
 

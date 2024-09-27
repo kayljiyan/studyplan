@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
-import models, schemas, security
+import models as models, schemas as schemas, security as security
 
 def login(db: Session, username: str, password: str):
     password = security.hash_password(password)

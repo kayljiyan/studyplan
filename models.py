@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, UUID, String, Float, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from dbconf import Base
-import schemas, security
+import schemas as schemas, security as security
 
 class Sprites(Base):
     __tablename__ = "sprites"
