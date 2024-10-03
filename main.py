@@ -35,10 +35,12 @@ async def login(
     try:
         account = dbops.login(db,request.username,request.password)
         data = { "user_uuid": f'{account.user_uuid}', "user_email": account.user_email }
-        access_token_expiry_date = timedelta(days=consts.ACCESS_TOKEN_EXPIRE_DAYS)
-        access_token = security.generate_access_token(data, access_token_expiry_date)
+        refresh_token_expiry_date = timedelta(days=consts.REFRESH_TOKEN_EXPIRE_DAYS)
+        refresh_token = security.generate_refresh_token(data, refresh_token_expiry_date)
         response.status_code = status.HTTP_200_OK
-        return { "access_token": access_token, "access_type": "Bearer" }
+        response.set_cookie(key="SET_REFRESH_TOKEN", value=refresh_token)
+        response.set_cookie(key="SET_REFRESH_TYPE", value="Bearer")
+        return {"detail": "Login successful"}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         response.headers["WWW-Authenticate"] = "Bearer"
@@ -75,8 +77,8 @@ async def confirm_email(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-@app.get('/api/v1/deserialize')
-async def deserialize(
+@app.get('/api/v1/access')
+async def get_access_token(
     token: Annotated[str, Depends(oauth2_scheme)],
     response: Response
     ):
@@ -84,8 +86,10 @@ async def deserialize(
         payload = security.verify_access_token(token)
         payload = schemas.TokenData(**payload)
         data = payload
+        access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
+        access_token = security.generate_refresh_token(data, access_token_expiry_date)
         response.status_code = status.HTTP_200_OK
-        return { 'data': data }
+        return { "access_token": access_token, "access_type": "Bearer" }
     except Exception as e:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return { "detail": str(e) }

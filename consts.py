@@ -8,4 +8,5 @@ import os
 # environment variables
 SECRET_KEY: str = os.environ.get('SECRET_KEY')
 ALGORITHM: str = "HS256"
-ACCESS_TOKEN_EXPIRE_DAYS: int = 1
+REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+ACCESS_TOKEN_EXPIRE_HOURS: int = 1
