@@ -87,7 +87,7 @@ async def get_access_token(
         payload = schemas.TokenData(**payload)
         data = payload
         access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
-        access_token = security.generate_refresh_token(data, access_token_expiry_date)
+        access_token = security.generate_access_token(data, access_token_expiry_date)
         response.status_code = status.HTTP_200_OK
         return { "access_token": access_token, "access_type": "Bearer" }
     except Exception as e:
