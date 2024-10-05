@@ -44,12 +44,12 @@ class ForumComments(ForumCommentAddToDB):
 
 class ForumMemberAddToDB(BaseModel):
     is_owner: bool
-    created_at: datetime
     forum_uuid: UUID4
     user_uuid: UUID4
 
 class ForumMembers(ForumMemberAddToDB):
     forum_member_uuid: UUID4
+    created_at: datetime
     class Config:
         from_attributes = True
 

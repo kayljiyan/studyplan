@@ -1,30 +1,31 @@
 from sqlalchemy import Column, ForeignKey, UUID, String, Float, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from typing import List
+from sqlalchemy.orm import relationship, mapped_column, Mapped
 from dbconf import Base
 import schemas as schemas, security as security
 
-class Sprites(Base):
+class Sprite(Base):
     __tablename__ = "sprites"
 
-    sprite_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    sprite_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     sprite_sources = Column(String, nullable=False, unique=True)
     sprite_summon_chance = Column(Float, nullable=False)
 
-class Forums(Base):
+class Forum(Base):
     __tablename__ = "forums"
 
-    forum_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
-    forum_title = Column(String, nullable=False, unique=True)
+    forum_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
+    forum_title = Column(String, nullable=False)
     forum_status = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=True, default=security.get_locale_datetime())
 
-    forum_members = relationship("ForumMembers", back_populates="forum")
-    forum_comments = relationship("ForumComments", back_populates="forum")
+    forum_members: Mapped[List["ForumMember"]] = relationship(back_populates="forum")
+    forum_comments: Mapped[List["ForumComment"]] = relationship("ForumComment", back_populates="forum")
 
-class Users(Base):
+class User(Base):
     __tablename__ = "users"
 
-    user_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    user_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     user_fname = Column(String, nullable=False)
     user_lname = Column(String, nullable=False)
     user_email = Column(String, nullable=False, unique=True)
@@ -32,80 +33,81 @@ class Users(Base):
     is_premium = Column(Boolean, nullable=False, default=False)
     is_confirmed = Column(Boolean, nullable=False, default=False)
 
-    sprite_instances = relationship("SpriteInstances", back_populates="user")
-    tasks = relationship("Tasks", back_populates="user")
-    user_logs = relationship("UserLogs", back_populates="user")
-class Tasks(Base):
+    sprite_instances: Mapped[List["SpriteInstance"]] = relationship(back_populates="user")
+    tasks: Mapped[List["Task"]] = relationship(back_populates="user")
+    user_logs: Mapped[List["UserLog"]] = relationship(back_populates="user")
+
+class Task(Base):
     __tablename__ = "tasks"
 
-    task_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    task_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     task_details = Column(String, nullable=False)
     task_deadline = Column(DateTime, nullable=False)
     is_done = Column(Boolean, default=False, nullable=False)
-    user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
+    user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
-    user = relationship("Users", back_populates="tasks")
-    task_logs = relationship("TaskLogs", back_populates="task")
+    user: Mapped["User"] = relationship(back_populates="tasks")
+    task_logs: Mapped[List["TaskLog"]] = relationship(back_populates="task")
 
-class SpriteInstances(Base):
+class SpriteInstance(Base):
     __tablename__ = "sprite_instances"
 
-    sprite_instance_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    sprite_instance_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     acquisition_date = Column(DateTime, nullable=False)
-    sprite_uuid = Column(UUID, ForeignKey("sprites.sprite_uuid"), nullable=False)
-    user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
+    sprite_uuid = mapped_column(UUID, ForeignKey("sprites.sprite_uuid"), nullable=False)
+    user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
-    user = relationship("Users", back_populates="sprite_instances")
-    sprite_instance_logs = relationship("SpriteInstanceLogs", back_populates="sprite_instance")
+    user: Mapped["User"] = relationship(back_populates="sprite_instances")
+    sprite_instance_logs: Mapped[List["SpriteInstanceLog"]] = relationship(back_populates="sprite_instance")
 
-class ForumMembers(Base):
+class ForumMember(Base):
     __tablename__ = "forum_members"
 
-    forum_member_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    forum_member_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     is_owner = Column(Boolean, nullable=False)
-    created_at = Column(DateTime, nullable=False)
-    forum_uuid = Column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
-    user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
+    created_at = Column(DateTime, nullable=True, default=security.get_locale_datetime())
+    forum_uuid = mapped_column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
+    user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
-    forum = relationship("Forums", back_populates="forum_members")
+    forum: Mapped["Forum"] = relationship(back_populates="forum_members")
 
-class ForumComments(Base):
+class ForumComment(Base):
     __tablename__ = "forum_comments"
 
-    forum_comment_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    forum_comment_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     forum_comment = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    forum_uuid = Column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
-    user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
+    forum_uuid = mapped_column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
+    user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
-    forum = relationship("Forums", back_populates="forum_comments")
+    forum: Mapped["Forum"] = relationship(back_populates="forum_comments")
 
-class TaskLogs(Base):
+class TaskLog(Base):
     __tablename__ = "task_logs"
 
-    task_log_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    task_log_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     task_log_details = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    task_uuid = Column(UUID, ForeignKey("tasks.task_uuid"), nullable=False)
+    task_uuid = mapped_column(UUID, ForeignKey("tasks.task_uuid"), nullable=False)
 
-    task = relationship("Tasks", back_populates="task_logs")
+    task: Mapped["Task"] = relationship(back_populates="task_logs")
 
-class UserLogs(Base):
+class UserLog(Base):
     __tablename__ = "user_logs"
 
-    user_log_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    user_log_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     user_log_details = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    user_uuid = Column(UUID, ForeignKey("users.user_uuid"), nullable=False)
+    user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
-    user = relationship("Users", back_populates="user_logs")
+    user: Mapped["User"] = relationship(back_populates="user_logs")
 
-class SpriteInstanceLogs(Base):
+class SpriteInstanceLog(Base):
     __tablename__ = "sprite_logs"
 
-    sprite_log_uuid = Column(UUID, primary_key=True, default=security.generate_uuid)
+    sprite_log_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     sprite_log_details = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    sprite_instance_uuid = Column(UUID, ForeignKey("sprite_instances.sprite_instance_uuid"), nullable=False)
+    sprite_instance_uuid = mapped_column(UUID, ForeignKey("sprite_instances.sprite_instance_uuid"), nullable=False)
 
-    sprite_instance = relationship("SpriteInstances", back_populates="sprite_instance_logs")
+    sprite_instance: Mapped["SpriteInstance"] = relationship(back_populates="sprite_instance_logs")

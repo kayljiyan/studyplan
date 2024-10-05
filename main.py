@@ -183,6 +183,45 @@ async def get_tasks(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.post('/api/v1/forum')
+async def create_forum(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        forum_owner = {
+            "is_owner": True,
+            "user_uuid": payload.user_uuid
+        }
+        forum = schemas.ForumAddToDB(**data)
+        dbops.create_forum(db, forum, forum_owner)
+        response.status_code = status.HTTP_201_CREATED
+        return { "detail": "Forum has been created" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.get('/api/v1/forums')
+async def get_forums(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        payload = security.verify_access_token(token)
+        payload = schemas.TokenData(**payload)
+        forums = dbops.get_forums(db)
+        response.status_code = status.HTTP_200_OK
+        return { "data": forums }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 def main():
     from dotenv import load_dotenv
     import uvicorn

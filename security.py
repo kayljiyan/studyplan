@@ -29,6 +29,9 @@ def hash_password(password: str) -> str:
 def generate_uuid():
     return uuid.uuid4()
 
+def get_locale_datetime():
+    return datetime.now()
+
 def send_email(email: str):
     port = os.getenv('SMTP_PORT')
     smtp_server = os.getenv('SMTP_SERVER')
