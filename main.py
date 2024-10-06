@@ -34,11 +34,11 @@ async def login(
     ):
     try:
         account = dbops.login(db,request.username,request.password)
-        data = { "user_uuid": f'{account.user_uuid}', "user_email": account.user_email }
+        data = { "user_uuid": str(account.user_uuid), "token-type": "refresh" }
         refresh_token_expiry_date = timedelta(days=consts.REFRESH_TOKEN_EXPIRE_DAYS)
         refresh_token = security.generate_refresh_token(data, refresh_token_expiry_date)
         response.status_code = status.HTTP_200_OK
-        response.set_cookie(key="REFRESH_TOKEN", value=refresh_token, httponly=False, samesite="none", secure=True)
+        response.set_cookie(key="REFRESH_TOKEN", value=refresh_token, httponly=True, samesite="none", secure=True)
         return {"detail": "Login successful"}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -82,13 +82,16 @@ async def get_access_token(
     response: Response
     ):
     try:
-        print(request.cookies.get("REFRESH_TOKEN"))
         payload = security.verify_access_token(request.cookies.get("REFRESH_TOKEN"))
-        data = payload
-        access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
-        access_token = security.generate_access_token(data, access_token_expiry_date)
-        response.status_code = status.HTTP_200_OK
-        return { "access_token": access_token, "access_type": "Bearer" }
+        if payload.get('token-type') == 'refresh':
+            data = payload
+            access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
+            access_token = security.generate_access_token(data, access_token_expiry_date)
+            response.status_code = status.HTTP_200_OK
+            return { "access_token": access_token, "access_type": "Bearer" }
+        else:
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            return { "detail": "Invalid refresh token" }
     except Exception as e:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return { "detail": str(e) }

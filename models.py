@@ -42,6 +42,8 @@ class Task(Base):
 
     task_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     task_details = Column(String, nullable=False)
+    task_priority = Column(String, nullable=False)
+    task_category = Column(String, nullable=False)
     task_deadline = Column(DateTime, nullable=False)
     is_done = Column(Boolean, default=False, nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)

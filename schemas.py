@@ -65,6 +65,8 @@ class SpriteInstances(SpriteInstanceAddToDB):
 
 class TaskAddToDB(BaseModel):
     task_details: str
+    task_priority: str
+    task_category: str
     task_deadline: datetime
     user_uuid: UUID4
 
