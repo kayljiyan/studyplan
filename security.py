@@ -12,6 +12,7 @@ def generate_refresh_token(payload: dict, expiry_date: timedelta | None = None) 
     return jwt.encode(to_encode, consts.SECRET_KEY, algorithm=consts.ALGORITHM)
 
 def generate_access_token(payload: dict, expiry_date: timedelta | None = None) -> str:
+    payload["token_type"] = "access"
     to_encode = dict(payload).copy()
     if expiry_date:
         expire = datetime.now(timezone.utc) + expiry_date

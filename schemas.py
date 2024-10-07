@@ -4,6 +4,7 @@ from datetime import datetime
 class TokenData(BaseModel):
     user_uuid: str | None = None
     user_email: str | None = None
+    token_type: str | None = None
 
 class SpriteInstanceLogs(BaseModel):
     sprite_log_uuid: UUID4
