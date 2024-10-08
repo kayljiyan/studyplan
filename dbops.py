@@ -25,7 +25,7 @@ def confirm_email(db: Session, user_email: str):
         db.commit()
 
 def create_task(db: Session, task: schemas.TaskAddToDB):
-    db_task = models.Task(task_details=task.task_details, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
+    db_task = models.Task(task_details=task.task_details, task_category=task.task_category, task_priority=task.task_priority, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
     db.commit()
 
