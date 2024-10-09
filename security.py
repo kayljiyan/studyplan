@@ -44,7 +44,7 @@ def send_email(email: str):
     TEXT = f"""
     Confirm your email with the link below.
 
-    http://127.0.0.1:8000/api/v1/confirm/{email}"""
+    https://studyplan-api.onrender.com/api/v1/confirm/{email}"""
     message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
     context = ssl.create_default_context()
     with smtplib.SMTP(smtp_server, port) as server:
