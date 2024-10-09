@@ -36,7 +36,8 @@ def update_task(db: Session, task: schemas.TaskUpdateToDB):
             'task_details': task.task_details,
             'task_priority': task.task_priority,
             'task_category': task.task_category,
-            'task_deadline': task.task_deadline
+            'task_deadline': task.task_deadline,
+            'is_done': task.is_done
         })
         db.commit()
 
