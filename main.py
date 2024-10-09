@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from typing import Annotated
 from datetime import timedelta
 import models as models, schemas as schemas, dbops as dbops, security as security, consts as consts
@@ -62,7 +63,7 @@ async def register(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-@app.get('/api/v1/confirm/{user_email}')
+@app.get('/api/v1/confirm/{user_email}', response_class=RedirectResponse)
 async def confirm_email(
     response: Response,
     user_email: str,
@@ -70,8 +71,8 @@ async def confirm_email(
 ):
     try:
         dbops.confirm_email(db, user_email)
-        response.status_code = status.HTTP_202_ACCEPTED
-        return { 'detail': 'Email has been confirmed' }
+        response.status_code = status.HTTP_308_PERMANENT_REDIRECT
+        return "https://studyplan-frontend.vercel.app/"
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
