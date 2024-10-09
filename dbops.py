@@ -30,10 +30,12 @@ def create_task(db: Session, task: schemas.TaskAddToDB):
     db.commit()
 
 def update_task(db: Session, task: schemas.TaskUpdateToDB):
-    db_task = db.query(models.Task).filter(models.Task.task_uuid == task.task_uuid)
+    db_task = db.query(models.Task).filter(models.Task.task_uuid == task.task_uuid, models.Task.user_uuid == task.user_uuid)
     if db_task:
         db_task.update({
             'task_details': task.task_details,
+            'task_priority': task.task_priority,
+            'task_category': task.task_category,
             'task_deadline': task.task_deadline
         })
         db.commit()
