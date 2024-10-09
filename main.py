@@ -39,7 +39,7 @@ async def login(
         refresh_token_expiry_date = timedelta(days=consts.REFRESH_TOKEN_EXPIRE_DAYS)
         refresh_token = security.generate_refresh_token(data, refresh_token_expiry_date)
         response.status_code = status.HTTP_200_OK
-        response.set_cookie(key="REFRESH_TOKEN", value=refresh_token, httponly=False, samesite="lax", secure=True)
+        response.set_cookie(key="REFRESH_TOKEN", value=refresh_token, httponly=True, samesite="none", secure=True)
         return {"detail": "Login successful"}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
