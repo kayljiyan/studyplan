@@ -35,12 +35,14 @@ async def login(
     ):
     try:
         account = dbops.login(db,request.username,request.password)
-        data = { "user_uuid": str(account.user_uuid), "user_email": account.user_email, "token_type": "refresh" }
+        data = { "user_uuid": str(account.user_uuid), "user_email": account.user_email, "token_type": "access" }
         refresh_token_expiry_date = timedelta(days=consts.REFRESH_TOKEN_EXPIRE_DAYS)
-        refresh_token = security.generate_refresh_token(data, refresh_token_expiry_date)
+        access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
+        refresh_token = security.generate_refresh_token(refresh_token_expiry_date)
+        access_token = security.generate_access_token(data, access_token_expiry_date)
         response.status_code = status.HTTP_200_OK
         response.set_cookie(key="REFRESH_TOKEN", value=refresh_token, httponly=True, samesite="none", secure=True)
-        return {"detail": "Login successful"}
+        return {"access_token": access_token, "access_type": "Bearer"}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         response.headers["WWW-Authenticate"] = "Bearer"
@@ -63,7 +65,7 @@ async def register(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-@app.get('/api/v1/confirm/{user_email}', response_class=RedirectResponse)
+@app.get('/api/v1/confirm/{user_email}')
 async def confirm_email(
     response: Response,
     user_email: str,
@@ -72,130 +74,120 @@ async def confirm_email(
     try:
         dbops.confirm_email(db, user_email)
         response.status_code = status.HTTP_308_PERMANENT_REDIRECT
-        return "https://studyplan-frontend.vercel.app/"
+        return RedirectResponse("https://studyplan-frontend.vercel.app/")
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-@app.get('/api/v1/access')
-async def get_access_token(
-    request: Request,
-    response: Response
-    ):
-    try:
-        payload = security.verify_access_token(request.cookies.get("REFRESH_TOKEN"))
-        if payload.get('token_type') == 'refresh':
-            data = payload
-            access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
-            access_token = security.generate_access_token(data, access_token_expiry_date)
-            response.status_code = status.HTTP_200_OK
-            return { "access_token": access_token, "access_type": "Bearer" }
-        else:
-            response.status_code = status.HTTP_401_UNAUTHORIZED
-            return { "detail": "Invalid refresh token" }
-    except Exception as e:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return { "detail": str(e) }
-
 @app.post('/api/v1/task')
 async def create_task(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
         data = await request.json()
-        payload = security.verify_access_token(token)
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         data = {**data, 'user_uuid': payload.user_uuid}
         task = schemas.TaskAddToDB(**data)
         dbops.create_task(db, task)
         response.status_code = status.HTTP_201_CREATED
-        return { "detail": "Task has been created" }
+        return { "detail": "Task has been created", "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 @app.patch('/api/v1/task')
 async def update_task(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
         data = await request.json()
-        payload = security.verify_access_token(token)
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         data = {**data, 'user_uuid': payload.user_uuid}
         task = schemas.TaskUpdateToDB(**data)
         dbops.update_task(db, task)
         response.status_code = status.HTTP_202_ACCEPTED
-        return { "detail": "Task has been updated" }
+        return { "detail": "Task has been updated", "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 @app.patch('/api/v1/task/{task_uuid}')
 async def complete_task(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
     task_uuid: str,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
-        payload = security.verify_access_token(token)
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         dbops.complete_task(db, task_uuid, payload.user_uuid)
         response.status_code = status.HTTP_200_OK
-        return { "detail": "Task has been completed" }
+        return { "detail": "Task has been completed", "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 @app.delete('/api/v1/task/{task_uuid}')
 async def delete_task(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
     task_uuid: str,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
-        payload = security.verify_access_token(token)
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         dbops.delete_task(db, task_uuid, payload.user_uuid)
-        response.status_code = status.HTTP_204_NO_CONTENT
+        response.status_code = status.HTTP_204_NO_CONTENT if access_token is not None else status.HTTP_202_ACCEPTED
+        return { "detail": "Task has been deleted", "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 @app.get('/api/v1/tasks')
 async def get_tasks(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
-        payload = security.verify_access_token(token)
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         tasks = dbops.get_tasks(db, payload.user_uuid)
         response.status_code = status.HTTP_200_OK
-        return { "data": tasks }
+        return { "data": tasks, "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 @app.post('/api/v1/forum')
 async def create_forum(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
         data = await request.json()
-        payload = security.verify_access_token(token)
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         forum_owner = {
             "is_owner": True,
@@ -204,23 +196,25 @@ async def create_forum(
         forum = schemas.ForumAddToDB(**data)
         dbops.create_forum(db, forum, forum_owner)
         response.status_code = status.HTTP_201_CREATED
-        return { "detail": "Forum has been created" }
+        return { "detail": "Forum has been created", "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
 @app.get('/api/v1/forums')
 async def get_forums(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
     response: Response,
     db: Session = Depends(get_db)
     ):
     try:
-        payload = security.verify_access_token(token)
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         forums = dbops.get_forums(db)
         response.status_code = status.HTTP_200_OK
-        return { "data": forums }
+        return { "data": forums, "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
