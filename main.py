@@ -91,6 +91,7 @@ async def create_task(
         data = await request.json()
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
+        print(payload)
         data = {**data, 'user_uuid': payload.user_uuid}
         task = schemas.TaskAddToDB(**data)
         dbops.create_task(db, task)
