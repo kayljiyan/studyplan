@@ -73,6 +73,7 @@ class Users(UserRegister):
 
 class ForumAddToDB(BaseModel):
     forum_title: str
+    forum_category: str
     forum_details: str
     forum_status: str
 
