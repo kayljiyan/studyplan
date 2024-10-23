@@ -188,6 +188,7 @@ async def create_forum(
     try:
         refresh_token = request.cookies.get('REFRESH_TOKEN')
         data = await request.json()
+        print(access_token)
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         print(payload)
         payload = schemas.TokenData(**payload)
