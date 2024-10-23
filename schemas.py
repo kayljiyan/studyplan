@@ -6,33 +6,6 @@ class TokenData(BaseModel):
     user_email: str | None = None
     token_type: str | None = None
 
-class SpriteInstanceLogs(BaseModel):
-    sprite_log_uuid: UUID4
-    sprite_log_details: str
-    created_at: datetime
-    sprite_instance_uuid: UUID4
-
-    class Config:
-        from_attributes = True
-
-class UserLogs(BaseModel):
-    user_log_uuid: UUID4
-    user_log_details: str
-    created_at: datetime
-    user_uuid: UUID4
-
-    class Config:
-        from_attributes = True
-
-class TaskLogs(BaseModel):
-    task_log_uuid: UUID4
-    task_log_details: str
-    created_at: datetime
-    task_uuid: UUID4
-
-    class Config:
-        from_attributes = True
-
 class ForumCommentAddToDB(BaseModel):
     forum_comment: str
     created_at: datetime
@@ -60,7 +33,6 @@ class SpriteInstanceAddToDB(BaseModel):
     user_uuid: UUID4
 class SpriteInstances(SpriteInstanceAddToDB):
     sprite_instance_uuid: UUID4
-    sprite_instance_logs: list[SpriteInstanceLogs]
     class Config:
         from_attributes = True
 
@@ -77,8 +49,6 @@ class TaskUpdateToDB(TaskAddToDB):
 
 class Tasks(TaskUpdateToDB):
     is_done: bool
-    task_logs: list[TaskLogs]
-
     class Config:
         from_attributes = True
 
@@ -96,14 +66,14 @@ class Users(UserRegister):
     is_confirmed: bool
     sprite_instances: list[SpriteInstances]
     tasks: list[Tasks]
-    user_logs: list[UserLogs]
     class Config:
         from_attributes = True
 
 class ForumAddToDB(BaseModel):
     forum_title: str
+    forum_details: str
     forum_status: str
-class Forums(BaseModel):
+class Forums(ForumAddToDB):
     forum_uuid: UUID4
     created_at: datetime
     forum_members: list[ForumMembers]

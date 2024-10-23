@@ -16,6 +16,7 @@ class Forum(Base):
 
     forum_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     forum_title = Column(String, nullable=False)
+    forum_details = Column(String, nullable=False)
     forum_status = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=True, default=security.get_locale_datetime())
 
