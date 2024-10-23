@@ -62,6 +62,7 @@ def get_tasks(db: Session, user_uuid: UUID):
 def create_forum(db: Session, forum: schemas.ForumAddToDB, forum_owner: dict):
     db_forum = models.Forum(
         forum_title=forum.forum_title,
+        forum_details=forum.forum_details,
         forum_status=forum.forum_status
     )
     db.add(db_forum)
