@@ -189,7 +189,9 @@ async def create_forum(
         refresh_token = request.cookies.get('REFRESH_TOKEN')
         data = await request.json()
         payload, access_token = security.verify_access_token(refresh_token, access_token)
+        print(payload)
         payload = schemas.TokenData(**payload)
+        print(payload)
         forum_owner = {
             "is_owner": True,
             "user_uuid": payload.user_uuid,
