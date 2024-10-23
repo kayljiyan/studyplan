@@ -195,6 +195,7 @@ async def create_forum(
             "user_uuid": payload.user_uuid,
             "user_name": payload.user_name
         }
+        print(payload)
         forum = schemas.ForumAddToDB(**data)
         dbops.create_forum(db, forum, forum_owner)
         response.status_code = status.HTTP_201_CREATED
