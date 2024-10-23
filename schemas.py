@@ -75,6 +75,7 @@ class ForumAddToDB(BaseModel):
     forum_title: str
     forum_details: str
     forum_status: str
+
 class Forums(ForumAddToDB):
     forum_uuid: UUID4
     created_at: datetime
