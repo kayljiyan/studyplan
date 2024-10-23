@@ -3,6 +3,7 @@ from datetime import datetime
 
 class TokenData(BaseModel):
     user_uuid: str | None = None
+    user_name: str | None = None
     user_email: str | None = None
     token_type: str | None = None
 
@@ -18,6 +19,7 @@ class ForumComments(ForumCommentAddToDB):
 
 class ForumMemberAddToDB(BaseModel):
     is_owner: bool
+    user_name: str
     forum_uuid: UUID4
     user_uuid: UUID4
 

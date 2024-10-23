@@ -191,7 +191,8 @@ async def create_forum(
         payload = schemas.TokenData(**payload)
         forum_owner = {
             "is_owner": True,
-            "user_uuid": payload.user_uuid
+            "user_uuid": payload.user_uuid,
+            "user_name": payload.user_name
         }
         forum = schemas.ForumAddToDB(**data)
         dbops.create_forum(db, forum, forum_owner)

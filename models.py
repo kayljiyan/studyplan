@@ -67,6 +67,7 @@ class ForumMember(Base):
     __tablename__ = "forum_members"
 
     forum_member_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
+    user_name = Column(String, nullable=False)
     is_owner = Column(Boolean, nullable=False)
     created_at = Column(DateTime, nullable=True, default=security.get_locale_datetime())
     forum_uuid = mapped_column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)

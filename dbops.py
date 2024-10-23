@@ -73,6 +73,7 @@ def create_forum(db: Session, forum: schemas.ForumAddToDB, forum_owner: dict):
     db_forum_member = schemas.ForumMemberAddToDB(**forum_owner)
     db_forum_member = models.ForumMember(
         is_owner=db_forum_member.is_owner,
+        user_name=db_forum_member.user_name,
         forum_uuid=db_forum_member.forum_uuid,
         user_uuid=db_forum_member.user_uuid
     )
