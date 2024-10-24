@@ -81,7 +81,7 @@ class ForumComment(Base):
 
     forum_comment_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
     forum_comment = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=security.get_locale_datetime())
     forum_uuid = mapped_column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 

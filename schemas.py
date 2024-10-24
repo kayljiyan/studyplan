@@ -9,11 +9,11 @@ class TokenData(BaseModel):
 
 class ForumCommentAddToDB(BaseModel):
     forum_comment: str
-    created_at: datetime
     forum_uuid: UUID4
     user_uuid: UUID4
 class ForumComments(ForumCommentAddToDB):
     forum_comment_uuid: UUID4
+    created_at: datetime
     class Config:
         from_attributes = True
 

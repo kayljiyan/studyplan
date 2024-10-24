@@ -188,21 +188,44 @@ async def create_forum(
     try:
         refresh_token = request.cookies.get('REFRESH_TOKEN')
         data = await request.json()
-        print(access_token)
         payload, access_token = security.verify_access_token(refresh_token, access_token)
-        print(payload)
         payload = schemas.TokenData(**payload)
-        print(payload)
         forum_owner = {
             "is_owner": True,
             "user_uuid": payload.user_uuid,
             "user_name": payload.user_name
         }
-        print(payload)
         forum = schemas.ForumAddToDB(**data)
         dbops.create_forum(db, forum, forum_owner)
         response.status_code = status.HTTP_201_CREATED
         return { "detail": "Forum has been created", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.post('/api/v1/comment')
+async def create_comment(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        data = await request.json()
+        print(access_token)
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        data["user_uuid"] = payload.user_uuid
+        forum_member = {
+            "is_owner": False,
+            "user_uuid": payload.user_uuid,
+            "user_name": payload.user_name
+        }
+        comment = schemas.ForumCommentAddToDB(**data)
+        dbops.create_comment(db, comment, forum_member)
+        response.status_code = status.HTTP_201_CREATED
+        return { "detail": "Comment has been submitted", "access_token": access_token }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }

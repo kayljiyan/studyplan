@@ -82,6 +82,27 @@ def create_forum(db: Session, forum: schemas.ForumAddToDB, forum_owner: dict):
     db.add(db_forum_member)
     db.commit()
 
+def create_comment(db: Session, comment: schemas.ForumCommentAddToDB, forum_member: dict):
+    db_comment = models.ForumComment(
+        forum_comment=comment.forum_comment,
+        forum_uuid=comment.forum_uuid,
+        user_uuid=comment.user_uuid
+    )
+    db.add(db_comment)
+    db.commit()
+    forum_member["forum_uuid"] = db_comment.forum_uuid
+    db_forum_member = schemas.ForumMemberAddToDB(**forum_member)
+    is_member = len(db.query(models.ForumMember).filter(models.ForumMember.user_uuid == db_forum_member.user_uuid and models.ForumMember.forum_uuid == db_forum_member.forum_uuid).all())
+    if not is_member:
+        db_forum_member = models.ForumMember(
+            is_owner=db_forum_member.is_owner,
+            user_name=db_forum_member.user_name,
+            forum_uuid=db_forum_member.forum_uuid,
+            user_uuid=db_forum_member.user_uuid
+        )
+        db.add(db_forum_member)
+        db.commit()
+
 def get_forums(db: Session):
     forums = db.query(models.Forum).options(joinedload(models.Forum.forum_comments), joinedload(models.Forum.forum_members)).all()
     return forums
