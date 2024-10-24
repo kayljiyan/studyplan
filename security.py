@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime, timezone
+from zoneinfo import ZoneInfo
 from typing import Any
 import jwt, consts as consts, hashlib, uuid, os, smtplib, ssl
 
@@ -45,7 +46,8 @@ def generate_uuid():
     return uuid.uuid4()
 
 def get_locale_datetime():
-    return datetime.now()
+    asia_utc = ZoneInfo("Asia/Singapore")
+    return datetime.now(tz=asia_utc)
 
 def send_email(email: str):
     port = os.getenv('SMTP_PORT')
