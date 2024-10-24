@@ -85,3 +85,7 @@ def create_forum(db: Session, forum: schemas.ForumAddToDB, forum_owner: dict):
 def get_forums(db: Session):
     forums = db.query(models.Forum).options(joinedload(models.Forum.forum_comments), joinedload(models.Forum.forum_members)).all()
     return forums
+
+def get_forum(forum_uuid: UUID, db: Session):
+    forum = db.query(models.Forum).filter(models.Forum.forum_uuid == UUID(forum_uuid)).options(joinedload(models.Forum.forum_comments), joinedload(models.Forum.forum_members)).all()
+    return forum

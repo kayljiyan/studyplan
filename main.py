@@ -225,6 +225,25 @@ async def get_forums(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.get('/api/v1/forum/{forum_uuid}')
+async def get_forum(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    forum_uuid: str,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        forums = dbops.get_forum(forum_uuid, db)
+        response.status_code = status.HTTP_200_OK
+        return { "data": forums, "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 def main():
     from dotenv import load_dotenv
     import uvicorn
