@@ -56,7 +56,7 @@ def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
         db.commit()
 
 def get_tasks(db: Session, user_uuid: UUID):
-    tasks = db.query(models.Task).filter(models.Task.user_uuid == UUID(user_uuid)).options(joinedload(models.Task.user), joinedload(models.Task.task_logs)).all()
+    tasks = db.query(models.Task).filter(models.Task.user_uuid == UUID(user_uuid)).options(joinedload(models.Task.user)).all()
     return tasks
 
 def create_forum(db: Session, forum: schemas.ForumAddToDB, forum_owner: dict):
