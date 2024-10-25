@@ -92,8 +92,8 @@ def create_comment(db: Session, comment: schemas.ForumCommentAddToDB, forum_memb
     db.commit()
     forum_member["forum_uuid"] = db_comment.forum_uuid
     db_forum_member = schemas.ForumMemberAddToDB(**forum_member)
-    is_member = len(db.query(models.ForumMember).filter(models.ForumMember.user_uuid == db_forum_member.user_uuid and models.ForumMember.forum_uuid == db_forum_member.forum_uuid).all())
-    if not is_member:
+    member = len(db.query(models.ForumMember).filter(models.ForumMember.user_uuid == db_forum_member.user_uuid and models.ForumMember.forum_uuid == db_forum_member.forum_uuid).all())
+    if member == 0:
         db_forum_member = models.ForumMember(
             is_owner=db_forum_member.is_owner,
             user_name=db_forum_member.user_name,
