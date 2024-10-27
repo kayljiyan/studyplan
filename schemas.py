@@ -43,7 +43,6 @@ class TaskAddToDB(BaseModel):
     task_priority: str
     task_category: str
     task_deadline: datetime
-    is_done: bool
     user_uuid: UUID4
 
 class TaskUpdateToDB(TaskAddToDB):
