@@ -77,7 +77,7 @@ async def get_user(
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         response.status_code = status.HTTP_200_OK
-        return { "access_token": access_token }
+        return { "data": payload }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
