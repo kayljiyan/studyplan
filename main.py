@@ -65,6 +65,23 @@ async def register(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.get('/api/v1/user')
+async def get_user(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        response.status_code = status.HTTP_200_OK
+        return { "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.get('/api/v1/confirm/{user_email}')
 async def confirm_email(
     response: Response,
