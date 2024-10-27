@@ -24,6 +24,12 @@ def confirm_email(db: Session, user_email: str):
         db_user.update({'is_confirmed': True})
         db.commit()
 
+def change_password(db: Session, user_uuid: UUID, password: str):
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    hashed_password = security.hash_password(password)
+    db_user.user_password = hashed_password
+    db.commit()
+
 def create_task(db: Session, task: schemas.TaskAddToDB):
     db_task = models.Task(task_details=task.task_details, task_category=task.task_category, task_priority=task.task_priority, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
@@ -107,3 +113,7 @@ def get_forums(db: Session):
 def get_forum(forum_uuid: UUID, db: Session):
     forum = db.query(models.Forum).filter(models.Forum.forum_uuid == UUID(forum_uuid)).options(joinedload(models.Forum.forum_comments), joinedload(models.Forum.forum_members)).all()
     return forum
+
+def get_task(task_uuid: UUID, db: Session):
+    task = db.query(models.Task).filter(models.Task.task_uuid == UUID(task_uuid)).all()
+    return task

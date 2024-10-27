@@ -79,6 +79,25 @@ async def confirm_email(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.patch('/api/v1/password')
+async def change_password(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        dbops.change_password(db, payload.user_uuid, data.get('user_password'))
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Password has been changed", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.post('/api/v1/task')
 async def create_task(
     access_token: Annotated[str, Depends(oauth2_scheme)],
@@ -172,6 +191,25 @@ async def get_tasks(
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         tasks = dbops.get_tasks(db, payload.user_uuid)
+        response.status_code = status.HTTP_200_OK
+        return { "data": tasks, "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.get('/api/v1/task/{task_uuid}')
+async def get_task(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    task_uuid: str,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        tasks = dbops.get_task(task_uuid, db)
         response.status_code = status.HTTP_200_OK
         return { "data": tasks, "access_token": access_token }
     except Exception as e:

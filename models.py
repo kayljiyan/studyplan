@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, UUID, String, Float, DateTime, Boolean
+from sqlalchemy import Column, ForeignKey, UUID, String, Float, DateTime, Boolean, Integer
 from typing import List
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from dbconf import Base
@@ -34,6 +34,7 @@ class User(Base):
     user_password = Column(String, nullable=False)
     is_premium = Column(Boolean, nullable=False, default=False)
     is_confirmed = Column(Boolean, nullable=False, default=False)
+    user_points = Column(Integer, nullable=False)
 
     sprite_instances: Mapped[List["SpriteInstance"]] = relationship(back_populates="user")
     tasks: Mapped[List["Task"]] = relationship(back_populates="user")

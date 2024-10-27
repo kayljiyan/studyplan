@@ -66,6 +66,7 @@ class Users(UserRegister):
     user_uuid: UUID4
     is_premium: bool
     is_confirmed: bool
+    user_points: int
     sprite_instances: list[SpriteInstances]
     tasks: list[Tasks]
     class Config:
