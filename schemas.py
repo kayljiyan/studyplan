@@ -66,6 +66,7 @@ class Users(UserRegister):
     is_premium: bool
     is_confirmed: bool
     user_points: int
+    push_notif: bool
     sprite_instances: list[SpriteInstances]
     tasks: list[Tasks]
     class Config:

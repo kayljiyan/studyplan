@@ -35,6 +35,7 @@ class User(Base):
     is_premium = Column(Boolean, nullable=False, default=False)
     is_confirmed = Column(Boolean, nullable=False, default=False)
     user_points = Column(Integer, nullable=False)
+    push_notif = Column(Boolean, nullable=False, default=False)
 
     sprite_instances: Mapped[List["SpriteInstance"]] = relationship(back_populates="user")
     tasks: Mapped[List["Task"]] = relationship(back_populates="user")
