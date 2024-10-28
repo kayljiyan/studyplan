@@ -138,6 +138,24 @@ async def toggle_push(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.get('/api/v1/points')
+async def get_points(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        users = dbops.get_points(db)
+        response.status_code = status.HTTP_200_OK
+        return { "data": users, "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.post('/api/v1/task')
 async def create_task(
     access_token: Annotated[str, Depends(oauth2_scheme)],

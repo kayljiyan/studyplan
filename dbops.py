@@ -36,6 +36,9 @@ def toggle_push(db: Session, user_uuid: UUID):
     db_user.push_notif = (not db_user.push_notif)
     db.commit()
 
+def get_points(db: Session):
+    db_user = db.query(models.User).all()
+    return db_user
 def create_task(db: Session, task: schemas.TaskAddToDB):
     db_task = models.Task(task_details=task.task_details, task_category=task.task_category, task_priority=task.task_priority, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
