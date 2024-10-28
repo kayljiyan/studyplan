@@ -120,6 +120,25 @@ async def change_password(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.patch('/api/v1/push')
+async def toggle_push(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    user_uuid: str,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        dbops.toggle_push(db, payload.user_uuid)
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Push notification toggled", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.post('/api/v1/task')
 async def create_task(
     access_token: Annotated[str, Depends(oauth2_scheme)],

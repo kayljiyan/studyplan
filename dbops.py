@@ -31,6 +31,11 @@ def change_password(db: Session, user_uuid: UUID, old_password: str, new_passwor
     db_user.user_password = new_password
     db.commit()
 
+def toggle_push(db: Session, user_uuid: UUID):
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    db_user.push_notif = not db_user.push_notif
+    db.commit()
+
 def create_task(db: Session, task: schemas.TaskAddToDB):
     db_task = models.Task(task_details=task.task_details, task_category=task.task_category, task_priority=task.task_priority, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
