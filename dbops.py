@@ -37,7 +37,7 @@ def create_task(db: Session, task: schemas.TaskAddToDB):
     db.commit()
 
 def update_task(db: Session, task: schemas.TaskUpdateToDB):
-    db_task = db.query(models.Task).filter(models.Task.task_uuid == task.task_uuid, models.Task.user_uuid == task.user_uuid)
+    db_task = db.query(models.Task).filter(models.Task.task_uuid == task.task_uuid).filter(models.Task.user_uuid == task.user_uuid)
     if db_task:
         db_task.update({
             'task_details': task.task_details,
@@ -48,7 +48,7 @@ def update_task(db: Session, task: schemas.TaskUpdateToDB):
         db.commit()
 
 def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
-    db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid and models.Task.user_uuid == user_uuid)
+    db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid).filter(models.Task.user_uuid == user_uuid)
     if db_task:
         db_task.update({
             'is_done': True
@@ -56,7 +56,7 @@ def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
         db.commit()
 
 def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
-    db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid and models.Task.user_uuid == user_uuid)
+    db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid).filter(models.Task.user_uuid == user_uuid)
     if db_task:
         db_task.delete()
         db.commit()
