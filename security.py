@@ -49,19 +49,13 @@ def get_locale_datetime():
     asia_utc = ZoneInfo("Asia/Singapore")
     return datetime.now(tz=asia_utc)
 
-def send_email(email: str):
+def send_email(email: str, subject: str, body: str):
     port = os.getenv('SMTP_PORT')
     smtp_server = os.getenv('SMTP_SERVER')
     sender_email = os.getenv('SENDER_EMAIL')
     receiver_email = email
     password = os.getenv('SENDER_PASSWORD')
-    print(sender_email)
-    SUBJECT = "Email Confirmation"
-    TEXT = f"""
-    Confirm your email with the link below.
-
-    https://studyplan-api.onrender.com/api/v1/confirm/{email}"""
-    message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
+    message = 'Subject: {}\n\n{}'.format(subject, body)
     context = ssl.create_default_context()
     with smtplib.SMTP(smtp_server, port) as server:
         server.starttls(context=context)

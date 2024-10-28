@@ -58,7 +58,12 @@ async def register(
         data = await request.json()
         user = schemas.UserRegister(**data)
         dbops.register(db, user)
-        security.send_email(user.user_email)
+        SUBJECT = "Email Confirmation"
+        TEXT = f"""
+        Confirm your email with the link below.
+
+        https://studyplan-api.onrender.com/api/v1/confirm/{user.user_email}"""
+        security.send_email(user.user_email, SUBJECT, TEXT)
         response.status_code = status.HTTP_201_CREATED
         return { "detail": "Please check your email for confirmation link" }
     except Exception as e:
