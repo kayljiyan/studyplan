@@ -124,7 +124,6 @@ async def change_password(
 async def toggle_push(
     access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
-    user_uuid: str,
     response: Response,
     db: Session = Depends(get_db)
     ):
