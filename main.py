@@ -108,7 +108,7 @@ async def change_password(
         refresh_token = request.cookies.get('REFRESH_TOKEN')
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
-        dbops.change_password(db, payload.user_uuid, data.get('user_password'))
+        dbops.change_password(db, payload.user_uuid, data.get('old_password'), data.get('new_password'))
         response.status_code = status.HTTP_200_OK
         return { "detail": "Password has been changed", "access_token": access_token }
     except Exception as e:

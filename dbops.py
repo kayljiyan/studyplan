@@ -4,7 +4,7 @@ import models as models, schemas as schemas, security as security
 
 def login(db: Session, username: str, password: str):
     password = security.hash_password(password)
-    user = db.query(models.User).where(models.User.user_email == username and models.User.user_password == password).first()
+    user = db.query(models.User).filter(models.User.user_email == username).filter(models.User.user_password == password).first()
     if user is None:
         raise PermissionError(f'Incorrect username or password')
     elif user.is_confirmed:
@@ -24,10 +24,11 @@ def confirm_email(db: Session, user_email: str):
         db_user.update({'is_confirmed': True})
         db.commit()
 
-def change_password(db: Session, user_uuid: UUID, password: str):
-    hashed_password = security.hash_password(password)
-    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid and models.User.user_password == hashed_password).first()
-    db_user.user_password = hashed_password
+def change_password(db: Session, user_uuid: UUID, old_password: str, new_password: str):
+    old_password = security.hash_password(old_password)
+    new_password = security.hash_password(new_password)
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).filter(models.User.user_password == old_password).first()
+    db_user.user_password = new_password
     db.commit()
 
 def create_task(db: Session, task: schemas.TaskAddToDB):
