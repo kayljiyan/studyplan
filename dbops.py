@@ -62,11 +62,11 @@ def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
         if db_user:
             match (task_priority):
                 case "High":
-                    db_user.task_count += 5
+                    db_user.user_points += 5
                 case "Normal":
-                    db_user.task_count += 3
+                    db_user.user_points += 3
                 case "Low":
-                    db_user.task_count += 1
+                    db_user.user_points += 1
             db.commit()
 
 def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
