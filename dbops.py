@@ -33,7 +33,7 @@ def change_password(db: Session, user_uuid: UUID, old_password: str, new_passwor
 
 def toggle_push(db: Session, user_uuid: UUID):
     db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
-    db_user.push_notif = not db_user.push_notif
+    db_user.push_notif = (not db_user.push_notif)
     db.commit()
 
 def create_task(db: Session, task: schemas.TaskAddToDB):
@@ -53,12 +53,21 @@ def update_task(db: Session, task: schemas.TaskUpdateToDB):
         db.commit()
 
 def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
-    db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid).filter(models.Task.user_uuid == user_uuid)
+    db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid).filter(models.Task.user_uuid == user_uuid).first()
     if db_task:
-        db_task.update({
-            'is_done': True
-        })
+        db_task.is_done = True
+        task_priority = db_task.task_priority
         db.commit()
+        db_user = db.query(models.User).filter(models.Task.user_uuid == user_uuid).first()
+        if db_user:
+            match (task_priority):
+                case "High":
+                    db_user.task_count += 5
+                case "Normal":
+                    db_user.task_count += 3
+                case "Low":
+                    db_user.task_count += 1
+            db.commit()
 
 def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
     db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid).filter(models.Task.user_uuid == user_uuid)
