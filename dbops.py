@@ -33,6 +33,7 @@ def change_password(db: Session, user_uuid: UUID, old_password: str, new_passwor
 
 def toggle_push(db: Session, user_uuid: UUID, toggle: bool):
     db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    print(toggle)
     db_user.push_notif = toggle
     db.commit()
 
