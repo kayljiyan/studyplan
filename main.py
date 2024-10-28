@@ -128,10 +128,11 @@ async def toggle_push(
     db: Session = Depends(get_db)
     ):
     try:
+        data = await request.json();
         refresh_token = request.cookies.get('REFRESH_TOKEN')
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
-        dbops.toggle_push(db, payload.user_uuid)
+        dbops.toggle_push(db, payload.user_uuid, data.get('push_notif'))
         response.status_code = status.HTTP_200_OK
         return { "detail": "Push notification toggled", "access_token": access_token }
     except Exception as e:
