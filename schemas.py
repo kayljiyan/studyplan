@@ -5,6 +5,7 @@ class TokenData(BaseModel):
     user_uuid: str | None = None
     user_name: str | None = None
     user_email: str | None = None
+    push_notif: bool | None = False
     token_type: str | None = None
 
 class ForumCommentAddToDB(BaseModel):

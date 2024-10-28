@@ -35,7 +35,7 @@ async def login(
     ):
     try:
         account = dbops.login(db,request.username,request.password)
-        data = { "user_uuid": str(account.user_uuid), "user_email": account.user_email, "user_name": f"{account.user_fname} {account.user_lname}","token_type": "access" }
+        data = { "user_uuid": str(account.user_uuid), "user_email": account.user_email, "user_name": f"{account.user_fname} {account.user_lname}", "push_notif": account.push_notif, "token_type": "access" }
         refresh_token_expiry_date = timedelta(days=consts.REFRESH_TOKEN_EXPIRE_DAYS)
         access_token_expiry_date = timedelta(hours=consts.ACCESS_TOKEN_EXPIRE_HOURS)
         refresh_token = security.generate_refresh_token(refresh_token_expiry_date)

@@ -25,8 +25,8 @@ def confirm_email(db: Session, user_email: str):
         db.commit()
 
 def change_password(db: Session, user_uuid: UUID, password: str):
-    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
     hashed_password = security.hash_password(password)
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid and models.User.user_password == hashed_password).first()
     db_user.user_password = hashed_password
     db.commit()
 
