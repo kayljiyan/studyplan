@@ -293,7 +293,7 @@ async def complete_task(
         return { "detail": str(e) }
 
 @app.patch('/api/v1/session')
-async def complete_task(
+async def complete_session(
     access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
     response: Response,
