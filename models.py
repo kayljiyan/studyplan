@@ -8,8 +8,10 @@ class Sprite(Base):
     __tablename__ = "sprites"
 
     sprite_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
-    sprite_sources = Column(String, nullable=False, unique=True)
+    sprite_source = Column(String, nullable=False, unique=True)
     sprite_summon_chance = Column(Float, nullable=False)
+
+    sprite_instances: Mapped[List["SpriteInstance"]] = relationship(back_populates="sprite")
 
 class Forum(Base):
     __tablename__ = "forums"
@@ -59,11 +61,12 @@ class SpriteInstance(Base):
     __tablename__ = "sprite_instances"
 
     sprite_instance_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
-    acquisition_date = Column(DateTime, nullable=False)
+    acquisition_date = Column(DateTime, nullable=False, default=security.get_locale_datetime)
     sprite_uuid = mapped_column(UUID, ForeignKey("sprites.sprite_uuid"), nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
     user: Mapped["User"] = relationship(back_populates="sprite_instances")
+    sprite: Mapped["Sprite"] = relationship(back_populates="sprite_instances")
     # sprite_instance_logs: Mapped[List["SpriteInstanceLog"]] = relationship(back_populates="sprite_instance")
 
 class ForumMember(Base):

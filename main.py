@@ -157,6 +157,60 @@ async def get_points(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.get('/api/v1/sprites')
+async def get_sprites(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        sprites = dbops.get_sprites(db, payload.user_uuid)
+        response.status_code = status.HTTP_200_OK
+        return { "data": sprites, "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.get('/api/v1/sprites/single')
+async def single_pull(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        dbops.gacha_life(db, payload.user_uuid, 1)
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Single pull successful", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.get('/api/v1/sprites/ten')
+async def ten_pull(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        dbops.gacha_life(db, payload.user_uuid, 10)
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Ten pull successful", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.post('/api/v1/task')
 async def create_task(
     access_token: Annotated[str, Depends(oauth2_scheme)],

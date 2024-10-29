@@ -38,8 +38,10 @@ def toggle_push(db: Session, user_uuid: UUID, toggle: bool):
     db.commit()
 
 def get_points(db: Session):
-    db_user = db.query(models.User).all()
-    return db_user
+    db_user = db.query(models.User.user_uuid, models.User.user_points).all()
+    results = [{"user_uuid": user_uuid, "user_points": user_points} for user_uuid, user_points in db_user]
+    return results
+
 def create_task(db: Session, task: schemas.TaskAddToDB):
     db_task = models.Task(task_details=task.task_details, task_category=task.task_category, task_priority=task.task_priority, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
@@ -135,3 +137,28 @@ def get_forum(forum_uuid: UUID, db: Session):
 def get_task(task_uuid: UUID, db: Session):
     task = db.query(models.Task).filter(models.Task.task_uuid == UUID(task_uuid)).all()
     return task
+
+def gacha_life(db: Session, user_uuid: UUID, pull: int):
+    from random import choices
+    sources = []
+    probabilities = []
+    sprites = db.query(models.Sprite).all()
+    for sprite in sprites:
+        sources.append({str(sprite.sprite_uuid): sprite.sprite_source})
+        probabilities.append(sprite.sprite_summon_chance)
+    for i in range(0, pull):
+        choice: dict = choices(sources, probabilities, k=1)[0]
+        print(list(choice.keys())[0])
+        db_sprite_instance = models.SpriteInstance(
+            user_uuid = user_uuid,
+            sprite_uuid = list(choice.keys())[0]
+        )
+        db.add(db_sprite_instance)
+        db.commit()
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    db_user.user_points -= pull*20
+    db.commit()
+
+def get_sprites(db: Session, user_uuid: UUID):
+    sprites = db.query(models.SpriteInstance).filter(models.SpriteInstance.user_uuid == UUID(user_uuid)).options(joinedload(models.SpriteInstance.sprite)).all()
+    return sprites

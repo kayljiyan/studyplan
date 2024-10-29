@@ -89,7 +89,7 @@ class Forums(ForumAddToDB):
 
 class Sprites(BaseModel):
     sprite_uuid: UUID4
-    sprite_sources: str
+    sprite_source: str
     sprite_summon_chance: float
 
     class Config:
