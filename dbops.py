@@ -163,3 +163,8 @@ def gacha_life(db: Session, user_uuid: UUID, pull: int):
 def get_sprites(db: Session, user_uuid: UUID):
     sprites = db.query(models.SpriteInstance).filter(models.SpriteInstance.user_uuid == UUID(user_uuid)).options(joinedload(models.SpriteInstance.sprite)).all()
     return sprites
+
+def change_avatar(db: Session, user_uuid: UUID, avatar: str):
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    db_user.user_avatar = avatar
+    db.commit()

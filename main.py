@@ -211,6 +211,25 @@ async def ten_pull(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.patch('/api/v1/avatar')
+async def change_avatar(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        dbops.change_avatar(db, payload.user_uuid, data.get("user_avatar"))
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Avatar changed", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.post('/api/v1/task')
 async def create_task(
     access_token: Annotated[str, Depends(oauth2_scheme)],
