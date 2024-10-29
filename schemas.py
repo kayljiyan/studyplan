@@ -6,6 +6,7 @@ class TokenData(BaseModel):
     user_name: str | None = None
     user_email: str | None = None
     push_notif: bool | None = False
+    user_avatar: str | None = None
     token_type: str | None = None
 
 class ForumCommentAddToDB(BaseModel):
