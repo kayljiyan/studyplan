@@ -81,8 +81,9 @@ async def get_user(
         refresh_token = request.cookies.get('REFRESH_TOKEN')
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
+        user = dbops.get_user(db, payload.user_uuid)
         response.status_code = status.HTTP_200_OK
-        return { "data": payload }
+        return { "data": user }
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
