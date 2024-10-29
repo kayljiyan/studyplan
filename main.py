@@ -292,6 +292,24 @@ async def complete_task(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.patch('/api/v1/session')
+async def complete_task(
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        refresh_token = request.cookies.get('REFRESH_TOKEN')
+        payload, access_token = security.verify_access_token(refresh_token, access_token)
+        payload = schemas.TokenData(**payload)
+        dbops.complete_session(db, payload.user_uuid)
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Session has been completed", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.delete('/api/v1/task/{task_uuid}')
 async def delete_task(
     access_token: Annotated[str, Depends(oauth2_scheme)],

@@ -76,6 +76,12 @@ def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
                     db_user.user_points += 1
             db.commit()
 
+def complete_session(db: Session, user_uuid: UUID):
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    if db_user:
+        db_user.user_points += 5
+        db.commit()
+
 def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
     db_task = db.query(models.Task).filter(models.Task.task_uuid == task_uuid).filter(models.Task.user_uuid == user_uuid)
     if db_task:
