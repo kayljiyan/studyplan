@@ -146,12 +146,13 @@ def gacha_life(db: Session, user_uuid: UUID, pull: int):
     for sprite in sprites:
         sources.append({str(sprite.sprite_uuid): sprite.sprite_source})
         probabilities.append(sprite.sprite_summon_chance)
-    for i in range(0, pull):
-        choice: dict = choices(sources, probabilities, k=pull)[0]
-        print(list(choice.keys())[0])
+    choice: dict = choices(sources, probabilities, k=pull)
+    print(choice)
+    for element in choice:
+        print(list(element.keys())[0])
         db_sprite_instance = models.SpriteInstance(
             user_uuid = user_uuid,
-            sprite_uuid = list(choice.keys())[0]
+            sprite_uuid = list(element.keys())[0]
         )
         db.add(db_sprite_instance)
         db.commit()
