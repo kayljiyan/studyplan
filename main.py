@@ -175,7 +175,7 @@ async def get_sprites(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-@app.get('/api/v1/sprites/single')
+@app.post('/api/v1/sprites/single')
 async def single_pull(
     access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
@@ -193,7 +193,7 @@ async def single_pull(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
-@app.get('/api/v1/sprites/ten')
+@app.post('/api/v1/sprites/ten')
 async def ten_pull(
     access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
