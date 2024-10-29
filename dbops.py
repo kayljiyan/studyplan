@@ -63,8 +63,9 @@ def complete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
     if db_task:
         db_task.is_done = True
         task_priority = db_task.task_priority
+        print(task_priority)
         db.commit()
-        db_user = db.query(models.User).filter(models.Task.user_uuid == user_uuid).first()
+        db_user = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
         if db_user:
             match (task_priority):
                 case "High":
