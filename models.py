@@ -43,6 +43,7 @@ class User(Base):
     sprite_instances: Mapped[List["SpriteInstance"]] = relationship(back_populates="user")
     tasks: Mapped[List["Task"]] = relationship(back_populates="user")
     forum_comments: Mapped[List["ForumComment"]] = relationship(back_populates="user")
+    forum_members: Mapped[List["ForumMember"]] = relationship(back_populates="user")
     # user_logs: Mapped[List["UserLog"]] = relationship(back_populates="user")
 
 class Task(Base):
@@ -82,6 +83,7 @@ class ForumMember(Base):
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
     forum: Mapped["Forum"] = relationship(back_populates="forum_members")
+    user: Mapped["User"] = relationship(back_populates="forum_members")
 
 class ForumComment(Base):
     __tablename__ = "forum_comments"
