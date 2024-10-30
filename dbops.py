@@ -42,6 +42,11 @@ def get_points(db: Session):
     results = [{"user_uuid": user_uuid, "user_points": user_points} for user_uuid, user_points in db_user]
     return results
 
+def get_user(db: Session, user_uuid: UUID):
+    db_user: models.User = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
+    if db_user:
+        return db_user
+
 def create_task(db: Session, task: schemas.TaskAddToDB):
     db_task = models.Task(task_details=task.task_details, task_category=task.task_category, task_priority=task.task_priority, task_deadline=task.task_deadline, user_uuid=task.user_uuid)
     db.add(db_task)
