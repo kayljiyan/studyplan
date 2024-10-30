@@ -45,6 +45,7 @@ def get_points(db: Session):
 def get_user(db: Session, user_uuid: UUID):
     db_user: models.User = db.query(models.User).filter(models.User.user_uuid == user_uuid).first()
     if db_user:
+        print(db_user)
         return db_user
 
 def create_task(db: Session, task: schemas.TaskAddToDB):
@@ -181,7 +182,7 @@ def change_avatar(db: Session, user_uuid: UUID, avatar: str):
     db_user.user_avatar = avatar
     db.commit()
 
-def get_user(db: Session, user_uuid: UUID):
-    db_user = db.query(models.User.push_notif, models.User.user_avatar).filter(models.User.user_uuid == UUID(user_uuid)).all()
-    results = [{"user_uuid": user_uuid, "push_notif": push_notif, "user_avatar": user_avatar} for push_notif, user_avatar in db_user]
-    return results
+# def get_user(db: Session, user_uuid: UUID):
+#     db_user = db.query(models.User.push_notif, models.User.user_avatar).filter(models.User.user_uuid == UUID(user_uuid)).all()
+#     results = [{"user_uuid": user_uuid, "push_notif": push_notif, "user_avatar": user_avatar} for push_notif, user_avatar in db_user]
+#     return results
