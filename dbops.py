@@ -140,7 +140,7 @@ def create_comment(db: Session, comment: schemas.ForumCommentAddToDB, forum_memb
         db.commit()
 
 def get_forums(db: Session):
-    forums = db.query(models.Forum).options(joinedload(models.Forum.forum_comments), joinedload(models.Forum.forum_members)).all()
+    forums = db.query(models.Forum).options(joinedload(models.Forum.forum_comments).joinedload(models.ForumComment.user).load_only(models.User.user_avatar), joinedload(models.Forum.forum_members)).all()
     return forums
 
 def get_forum(forum_uuid: UUID, db: Session):
