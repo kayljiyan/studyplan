@@ -144,7 +144,7 @@ def get_forums(db: Session):
     return forums
 
 def get_forum(forum_uuid: UUID, db: Session):
-    forum = db.query(models.Forum).filter(models.Forum.forum_uuid == UUID(forum_uuid)).options(joinedload(models.Forum.forum_comments).joinedload(models.ForumComment.user), joinedload(models.Forum.forum_members).joinedload(models.ForumMember.user).load_only(models.User.user_avatar)).all()
+    forum = db.query(models.Forum).filter(models.Forum.forum_uuid == UUID(forum_uuid)).options(joinedload(models.Forum.forum_comments).joinedload(models.ForumComment.user).load_only(models.User.user_avatar), joinedload(models.Forum.forum_members).joinedload(models.ForumMember.user).load_only(models.User.user_avatar)).all()
     return forum
 
 def get_task(task_uuid: UUID, db: Session):
