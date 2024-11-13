@@ -150,7 +150,7 @@ async def recover_password(
     ):
     try:
         data = await request.json()
-        dbops.recover_password(db, data.get("email"), data.get('new_password'))
+        dbops.recover_password(db, data.get("user_email"), data.get('new_password'))
         response.status_code = status.HTTP_200_OK
         return { "detail": "Password has been changed", "access_token": access_token }
     except Exception as e:
