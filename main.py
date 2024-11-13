@@ -70,6 +70,27 @@ async def register(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return { "detail": str(e) }
 
+@app.post('/api/v1/forgot')
+async def forgot_password(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        user_email = data.get("user_email")
+        SUBJECT = "Password Recovery"
+        TEXT = f"""
+        Recover your password with the link below.
+
+        https://studyplan-one.vercel.app/recover/{user_email}"""
+        security.send_email(user.user_email, SUBJECT, TEXT)
+        response.status_code = status.HTTP_201_CREATED
+        return { "detail": "Please check your email for confirmation link" }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
 @app.get('/api/v1/user')
 async def get_user(
     access_token: Annotated[str, Depends(oauth2_scheme)],
@@ -115,6 +136,21 @@ async def change_password(
         payload, access_token = security.verify_access_token(refresh_token, access_token)
         payload = schemas.TokenData(**payload)
         dbops.change_password(db, payload.user_uuid, data.get('old_password'), data.get('new_password'))
+        response.status_code = status.HTTP_200_OK
+        return { "detail": "Password has been changed", "access_token": access_token }
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return { "detail": str(e) }
+
+@app.patch('/api/v1/recover')
+async def recover_password(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+    ):
+    try:
+        data = await request.json()
+        dbops.recover_password(db, data.get("email"), data.get('new_password'))
         response.status_code = status.HTTP_200_OK
         return { "detail": "Password has been changed", "access_token": access_token }
     except Exception as e:
