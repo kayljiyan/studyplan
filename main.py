@@ -80,9 +80,8 @@ async def register(request: Request, response: Response, db: Session = Depends(g
         dbops.register(db, user)
         SUBJECT = "Email Confirmation"
         TEXT = f"""
-        Confirm your email with the link below.
-
-        https://studyplan-api.onrender.com/api/v1/confirm/{user.user_email}"""
+        Your email is awaiting confirmation by the admin.
+        """
         security.send_email(user.user_email, SUBJECT, TEXT)
         response.status_code = status.HTTP_201_CREATED
         return {"detail": "Please check your email for confirmation link"}
@@ -140,7 +139,13 @@ async def confirm_email(
 ):
     try:
         dbops.confirm_email(db, user_email)
-        response.status_code = status.HTTP_308_PERMANENT_REDIRECT
+        SUBJECT = "Email Confirmation"
+        TEXT = f"""
+        Your email has been confirmed. Please proceed to login.
+
+        https://studyplan-one.vercel.app/"""
+        security.send_email(user_email, SUBJECT, TEXT)
+        response.status_code = status.HTTP_202_ACCEPTED
         return RedirectResponse("https://studyplan-one.vercel.app/")
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST

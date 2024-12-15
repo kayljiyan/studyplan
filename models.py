@@ -4,15 +4,15 @@ from sqlalchemy import (
     UUID,
     Boolean,
     Column,
-    DateTime,
+    Date,
     Float,
     ForeignKey,
     Integer,
     String,
+    Time,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-import schemas as schemas
 import security as security
 from dbconf import Base
 
@@ -37,7 +37,7 @@ class Forum(Base):
     forum_category = Column(String, nullable=False)
     forum_details = Column(String, nullable=False)
     forum_status = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=True, default=security.get_locale_datetime())
+    created_at = Column(Date, nullable=True, default=security.get_locale_datetime())
 
     forum_members: Mapped[List["ForumMember"]] = relationship(back_populates="forum")
     forum_comments: Mapped[List["ForumComment"]] = relationship(
@@ -75,7 +75,8 @@ class Task(Base):
     task_details = Column(String, nullable=False)
     task_priority = Column(String, nullable=False)
     task_category = Column(String, nullable=False)
-    task_deadline = Column(DateTime, nullable=False)
+    task_deadline = Column(Date, nullable=False)
+    task_time = Column(Time, nullable=False)
     is_done = Column(Boolean, default=False, nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
@@ -90,7 +91,7 @@ class SpriteInstance(Base):
         UUID, primary_key=True, default=security.generate_uuid
     )
     acquisition_date = Column(
-        DateTime, nullable=False, default=security.get_locale_datetime
+        Date, nullable=False, default=security.get_locale_datetime
     )
     sprite_uuid = mapped_column(UUID, ForeignKey("sprites.sprite_uuid"), nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
@@ -108,7 +109,7 @@ class ForumMember(Base):
     )
     user_name = Column(String, nullable=False)
     is_owner = Column(Boolean, nullable=False)
-    created_at = Column(DateTime, nullable=True, default=security.get_locale_datetime())
+    created_at = Column(Date, nullable=True, default=security.get_locale_datetime())
     forum_uuid = mapped_column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
@@ -123,9 +124,7 @@ class ForumComment(Base):
         UUID, primary_key=True, default=security.generate_uuid
     )
     forum_comment = Column(String, nullable=False)
-    created_at = Column(
-        DateTime, nullable=False, default=security.get_locale_datetime()
-    )
+    created_at = Column(Date, nullable=False, default=security.get_locale_datetime())
     forum_uuid = mapped_column(UUID, ForeignKey("forums.forum_uuid"), nullable=False)
     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
@@ -138,7 +137,7 @@ class ForumComment(Base):
 
 #     task_log_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
 #     task_log_details = Column(String, nullable=False)
-#     created_at = Column(DateTime, nullable=False)
+#     created_at = Column(Date, nullable=False)
 #     task_uuid = mapped_column(UUID, ForeignKey("tasks.task_uuid"), nullable=False)
 
 #     task: Mapped["Task"] = relationship(back_populates="task_logs")
@@ -148,7 +147,7 @@ class ForumComment(Base):
 
 #     user_log_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
 #     user_log_details = Column(String, nullable=False)
-#     created_at = Column(DateTime, nullable=False)
+#     created_at = Column(Date, nullable=False)
 #     user_uuid = mapped_column(UUID, ForeignKey("users.user_uuid"), nullable=False)
 
 #     user: Mapped["User"] = relationship(back_populates="user_logs")
@@ -158,7 +157,7 @@ class ForumComment(Base):
 
 #     sprite_log_uuid = mapped_column(UUID, primary_key=True, default=security.generate_uuid)
 #     sprite_log_details = Column(String, nullable=False)
-#     created_at = Column(DateTime, nullable=False)
+#     created_at = Column(Date, nullable=False)
 #     sprite_instance_uuid = mapped_column(UUID, ForeignKey("sprite_instances.sprite_instance_uuid"), nullable=False)
 
 #     sprite_instance: Mapped["SpriteInstance"] = relationship(back_populates="sprite_instance_logs")

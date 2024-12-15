@@ -96,6 +96,7 @@ def create_task(db: Session, task: schemas.TaskAddToDB):
         task_category=task.task_category,
         task_priority=task.task_priority,
         task_deadline=task.task_deadline,
+        task_time=task.task_time,
         user_uuid=task.user_uuid,
     )
     db.add(db_task)
