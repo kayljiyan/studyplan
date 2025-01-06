@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -130,8 +130,20 @@ async def get_user(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
 
+@app.get("/api/v1/users")
+async def get_users(
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    try:
+        users: List[models.User] = dbops.get_users(db)
+        response.status_code = status.HTTP_200_OK
+        return {"data": users}
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
 
-@app.get("/api/v1/confirm/{user_email}")
+@app.post("/api/v1/confirm/{user_email}")
 async def confirm_email(
     response: Response,
     user_email: str,
@@ -151,6 +163,22 @@ async def confirm_email(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
 
+@app.post("/api/v1/disable/{user_email}")
+async def disable_user(
+    response: Response,
+    user_email: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        dbops.disable_user(db, user_email)
+        SUBJECT = "Email Confirmation"
+        TEXT = f"""
+        Your email has been disabled by the admin."""
+        security.send_email(user_email, SUBJECT, TEXT)
+        response.status_code = status.HTTP_202_ACCEPTED
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
 
 @app.patch("/api/v1/password")
 async def change_password(

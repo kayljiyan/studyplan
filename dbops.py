@@ -41,6 +41,11 @@ def confirm_email(db: Session, user_email: str):
         db_user.update({"is_confirmed": True})
         db.commit()
 
+def disable_user(db: Session, user_email: str):
+    db_user = db.query(models.User).filter(models.User.user_email == user_email)
+    if db_user:
+        db_user.update({"is_confirmed": False})
+        db.commit()
 
 def change_password(db: Session, user_uuid: UUID, old_password: str, new_password: str):
     old_password = security.hash_password(old_password)
@@ -173,6 +178,11 @@ def get_tasks(db: Session, user_uuid: UUID):
         .all()
     )
     return tasks
+
+
+def get_users(db: Session):
+    users = db.query(models.User).all()
+    return users
 
 
 def create_forum(db: Session, forum: schemas.ForumAddToDB, forum_owner: dict):
