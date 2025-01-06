@@ -158,7 +158,6 @@ async def confirm_email(
         https://studyplan-one.vercel.app/"""
         security.send_email(user_email, SUBJECT, TEXT)
         response.status_code = status.HTTP_202_ACCEPTED
-        return RedirectResponse("https://studyplan-one.vercel.app/")
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
