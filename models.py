@@ -1,6 +1,8 @@
+from datetime import date
 from typing import List
 
 from sqlalchemy import (
+    DATE,
     UUID,
     Boolean,
     Column,
@@ -58,6 +60,8 @@ class User(Base):
     user_points = Column(Integer, nullable=False, default=0)
     push_notif = Column(Boolean, nullable=False, default=False)
     user_avatar = Column(String, nullable=False)
+    created_at = Column(DATE, nullable=False, default=date.today())
+    last_login = Column(DATE, nullable=False, default=date.today())
 
     sprite_instances: Mapped[List["SpriteInstance"]] = relationship(
         back_populates="user"

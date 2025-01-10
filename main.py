@@ -170,7 +170,7 @@ async def disable_user(
 ):
     try:
         dbops.disable_user(db, user_email)
-        SUBJECT = "Email Confirmation"
+        SUBJECT = "Account Disabled"
         TEXT = f"""
         Your email has been disabled by the admin."""
         security.send_email(user_email, SUBJECT, TEXT)

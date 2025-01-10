@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from sqlalchemy.orm import Session, joinedload, load_only
@@ -13,12 +14,13 @@ def login(db: Session, username: str, password: str):
         db.query(models.User)
         .filter(models.User.user_email == username)
         .filter(models.User.user_password == password)
-        .first()
     )
-    if user is None:
+    if user.first() is None:
         raise PermissionError(f"Incorrect username or password")
-    elif user.is_confirmed:
-        return user
+    check_confirm = user.first()
+    if check_confirm.is_confirmed:
+        user.update({"last_login": date.today()})
+        return check_confirm
     else:
         raise PermissionError(f"Email is not confirmed")
 
@@ -41,11 +43,13 @@ def confirm_email(db: Session, user_email: str):
         db_user.update({"is_confirmed": True})
         db.commit()
 
+
 def disable_user(db: Session, user_email: str):
     db_user = db.query(models.User).filter(models.User.user_email == user_email)
     if db_user:
         db_user.update({"is_confirmed": False})
         db.commit()
+
 
 def change_password(db: Session, user_uuid: UUID, old_password: str, new_password: str):
     old_password = security.hash_password(old_password)
