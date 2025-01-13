@@ -38,14 +38,14 @@ def register(db: Session, user: schemas.UserRegister):
 
 
 def confirm_email(db: Session, user_email: str):
-    db_user = db.query(models.User).filter(models.User.user_email == user_email)
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_email)
     if db_user:
         db_user.update({"is_confirmed": True})
         db.commit()
 
 
 def disable_user(db: Session, user_email: str):
-    db_user = db.query(models.User).filter(models.User.user_email == user_email)
+    db_user = db.query(models.User).filter(models.User.user_uuid == user_email)
     if db_user:
         db_user.update({"is_confirmed": False})
         db.commit()
