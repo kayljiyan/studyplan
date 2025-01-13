@@ -255,6 +255,32 @@ def get_forums(db: Session):
     return forums
 
 
+def get_user_forums(db: Session, user_id: str):
+    user_forums = []
+    forums = (
+        db.query(models.ForumMember.forum_uuid)
+        .filter(
+            models.ForumMember.user_uuid == user_id, models.ForumMember.is_owner == True
+        )
+        .all()
+    )
+    for forum in forums:
+        user_forum = (
+            db.query(models.Forum).filter(models.Forum.forum_uuid == forum).first()
+        )
+        user_forums.append(user_forum)
+    return user_forums
+
+
+def get_user_comments(db: Session, user_id: str):
+    forums = (
+        db.query(models.ForumComment)
+        .filter(models.ForumComment.user_uuid == user_id)
+        .all()
+    )
+    return forums
+
+
 def get_forum(forum_uuid: UUID, db: Session):
     forum = (
         db.query(models.Forum)

@@ -130,6 +130,7 @@ async def get_user(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
 
+
 @app.get("/api/v1/users")
 async def get_users(
     response: Response,
@@ -142,6 +143,7 @@ async def get_users(
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
+
 
 @app.post("/api/v1/confirm/{user_email}")
 async def confirm_email(
@@ -162,6 +164,7 @@ async def confirm_email(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
 
+
 @app.post("/api/v1/disable/{user_email}")
 async def disable_user(
     response: Response,
@@ -178,6 +181,7 @@ async def disable_user(
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
+
 
 @app.patch("/api/v1/password")
 async def change_password(
@@ -580,6 +584,36 @@ async def get_forums(
         forums = dbops.get_forums(db)
         response.status_code = status.HTTP_200_OK
         return {"data": forums, "access_token": access_token}
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
+
+
+@app.get("/api/v1/{user_id}/forums")
+async def get_user_forums(
+    response: Response,
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        forums = dbops.get_user_forums(db, user_id)
+        response.status_code = status.HTTP_200_OK
+        return {"data": forums}
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
+
+
+@app.get("/api/v1/{user_id}/comments")
+async def get_user_comments(
+    response: Response,
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        forums = dbops.get_user_comments(db, user_id)
+        response.status_code = status.HTTP_200_OK
+        return {"data": forums}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
