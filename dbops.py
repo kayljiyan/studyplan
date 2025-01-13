@@ -264,9 +264,10 @@ def get_user_forums(db: Session, user_id: str):
         )
         .all()
     )
+    print(forums)
     for forum in forums:
         user_forum = (
-            db.query(models.Forum).filter(models.Forum.forum_uuid == forum).first()
+            db.query(models.Forum).filter(models.Forum.forum_uuid == forum[0]).first()
         )
         user_forums.append(user_forum)
     return user_forums
