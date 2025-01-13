@@ -174,6 +174,22 @@ def delete_task(db: Session, task_uuid: UUID, user_uuid: UUID):
         db.commit()
 
 
+def delete_forum(db: Session, forum_uuid: UUID):
+    db_task = db.query(models.Forum).filter(models.Forum.forum_uuid == forum_uuid)
+    if db_task:
+        db_task.delete()
+        db.commit()
+
+
+def delete_comment(db: Session, comment_uuid: UUID):
+    db_task = db.query(models.ForumComment).filter(
+        models.ForumComment.forum_comment_uuid == comment_uuid
+    )
+    if db_task:
+        db_task.delete()
+        db.commit()
+
+
 def get_tasks(db: Session, user_uuid: UUID):
     tasks = (
         db.query(models.Task)

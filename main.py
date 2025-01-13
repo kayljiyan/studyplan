@@ -604,6 +604,21 @@ async def get_user_forums(
         return {"detail": str(e)}
 
 
+@app.delete("/api/v1/forums/{forum_id}")
+async def delete_user_forum(
+    response: Response,
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        forums = dbops.delete_forum(db, user_id)
+        response.status_code = status.HTTP_200_OK
+        return {"data": forums}
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
+
+
 @app.get("/api/v1/{user_id}/comments")
 async def get_user_comments(
     response: Response,
@@ -612,6 +627,21 @@ async def get_user_comments(
 ):
     try:
         forums = dbops.get_user_comments(db, user_id)
+        response.status_code = status.HTTP_200_OK
+        return {"data": forums}
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
+
+
+@app.delete("/api/v1/comment/{comment_id}")
+async def delete_user_comment(
+    response: Response,
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        forums = dbops.delete_comment(db, user_id)
         response.status_code = status.HTTP_200_OK
         return {"data": forums}
     except Exception as e:
