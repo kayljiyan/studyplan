@@ -607,11 +607,11 @@ async def get_user_forums(
 @app.delete("/api/v1/forums/{forum_id}")
 async def delete_user_forum(
     response: Response,
-    user_id: str,
+    forum_id: str,
     db: Session = Depends(get_db),
 ):
     try:
-        forums = dbops.delete_forum(db, user_id)
+        forums = dbops.delete_forum(db, forum_id)
         response.status_code = status.HTTP_200_OK
         return {"data": forums}
     except Exception as e:
@@ -637,11 +637,11 @@ async def get_user_comments(
 @app.delete("/api/v1/comment/{comment_id}")
 async def delete_user_comment(
     response: Response,
-    user_id: str,
+    comment_id: str,
     db: Session = Depends(get_db),
 ):
     try:
-        forums = dbops.delete_comment(db, user_id)
+        forums = dbops.delete_comment(db, comment_id)
         response.status_code = status.HTTP_200_OK
         return {"data": forums}
     except Exception as e:
