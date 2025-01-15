@@ -67,7 +67,7 @@ async def login(
         )
         log = {
             "user_log_details": "LOGGED IN",
-            "user_uuid": payload.user_uuid
+            "user_uuid": account.user_uuid
         }
         log = schemas.UserLogs(**log)
         dbops.add_log(db, log)
