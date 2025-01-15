@@ -37,6 +37,14 @@ def register(db: Session, user: schemas.UserRegister):
     db.commit()
 
 
+def add_log(db: Session, log: schemas.UserLogs):
+    db_user = models.UserLog(
+        user_log_details=log.user_log_details, user_uuid=log.user_uuid
+    )
+    db.add(db_user)
+    db.commit()
+
+
 def confirm_email(db: Session, user_email: str):
     db_user = db.query(models.User).filter(models.User.user_email == user_email)
     if db_user:
@@ -88,6 +96,11 @@ def get_points(db: Session):
         for user_uuid, user_points in db_user
     ]
     return results
+
+
+def get_logs(db: Session):
+    db_user = db.query(models.UserLog).all()
+    return db_user
 
 
 def get_user(db: Session, user_uuid: UUID):

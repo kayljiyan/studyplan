@@ -11,6 +11,11 @@ class TokenData(BaseModel):
     token_type: str | None = None
 
 
+class UserLogs(BaseModel):
+    user_log_details: str
+    user_uuid: UUID4
+
+
 class ForumCommentAddToDB(BaseModel):
     forum_comment: str
     forum_uuid: UUID4

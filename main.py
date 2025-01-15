@@ -65,6 +65,12 @@ async def login(
             samesite="none",
             secure=True,
         )
+        log = {
+            "user_log_details": "LOGGED IN",
+            "user_uuid": payload.user_uuid
+        }
+        log = schemas.UserLogs(**log)
+        dbops.add_log(db, log)
         return {"access_token": access_token, "access_type": "Bearer"}
     except Exception as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -531,6 +537,12 @@ async def create_forum(
         }
         forum = schemas.ForumAddToDB(**data)
         dbops.create_forum(db, forum, forum_owner)
+        log = {
+            "user_log_details": "FORUM POSTED",
+            "user_uuid": payload.user_uuid
+        }
+        log = schemas.UserLogs(**log)
+        dbops.add_log(db, log)
         response.status_code = status.HTTP_201_CREATED
         return {"detail": "Forum has been created", "access_token": access_token}
     except Exception as e:
@@ -561,6 +573,12 @@ async def create_comment(
         }
         comment = schemas.ForumCommentAddToDB(**data)
         dbops.create_comment(db, comment, forum_member)
+        log = {
+            "user_log_details": "COMMENT POSTED",
+            "user_uuid": payload.user_uuid
+        }
+        log = schemas.UserLogs(**log)
+        dbops.add_log(db, log)
         response.status_code = status.HTTP_201_CREATED
         return {"detail": "Comment has been submitted", "access_token": access_token}
     except Exception as e:
@@ -603,6 +621,18 @@ async def get_user_forums(
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
 
+@app.get("/api/v1/logs")
+async def get_logs(
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    try:
+        forums = dbops.get_logs(db)
+        response.status_code = status.HTTP_200_OK
+        return {"data": forums}
+    except Exception as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
 
 @app.delete("/api/v1/forums/{forum_id}")
 async def delete_user_forum(
